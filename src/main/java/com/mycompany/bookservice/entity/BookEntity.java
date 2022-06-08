@@ -12,14 +12,15 @@ import javax.persistence.*;
 @Getter
 @Setter
 public class BookEntity {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO )
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long bookId;
     @Column(length = 50)
     private String name;
     private String description;
     private Double pricePerQty;
-    private Double availability;
-    private String authorname;
+    private Double availableQty;
+    private String authorName;
     private String authorEmail;
 }

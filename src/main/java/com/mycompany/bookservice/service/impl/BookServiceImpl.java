@@ -6,7 +6,10 @@ import com.mycompany.bookservice.repository.BookRepository;
 import com.mycompany.bookservice.service.BookService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,27 +21,26 @@ public class BookServiceImpl implements BookService {
 
     @Autowired
     private BookRepository bookRepository;
-
     @Override
     public BookDTO addBook(BookDTO bookDTO) {
+        //convert DTO to ENTITY
         BookEntity bookEntity = new BookEntity();
-        BeanUtils.copyProperties(bookDTO, bookEntity);
+        BeanUtils.copyProperties(bookDTO, bookEntity);//all dto date will be set to entity
         bookEntity = bookRepository.save(bookEntity);
-        BeanUtils.copyProperties(bookEntity, bookDTO);
+        BeanUtils.copyProperties(bookEntity, bookDTO);//convert entity to dto
         return bookDTO;
     }
 
     //full update
     @Override
     public BookDTO updateBook(BookDTO bookDTO, Long bookId) {
-
         Optional<BookEntity> optEntity = bookRepository.findById(bookId);
         BookEntity be = null;
         if(optEntity.isPresent()){
             be = optEntity.get();
             be.setAuthorEmail(bookDTO.getAuthorEmail());
-            be.setAuthorname(bookDTO.getAuthorname());
-            be.setAvailability(bookDTO.getAvailability());
+            be.setAuthorName(bookDTO.getAuthorName());
+            be.setAvailableQty(bookDTO.getAvailableQty());
             be.setDescription(bookDTO.getDescription());
             be.setName(bookDTO.getName());
             be.setPricePerQty(bookDTO.getPricePerQty());
@@ -52,6 +54,8 @@ public class BookServiceImpl implements BookService {
     public void deleteBook(Long bookId) {
         bookRepository.deleteById(bookId);
     }
+
+    //partial update - only update price
     @Override
     public BookDTO updateBookPrice(BookDTO bookDTO, Long bookId) {
         Optional<BookEntity> optEntity = bookRepository.findById(bookId);
@@ -69,17 +73,28 @@ public class BookServiceImpl implements BookService {
     public List<BookDTO> getAllBook() {
 
         List<BookEntity> bookEntities = bookRepository.findAll();
-        List<BookDTO> bookDtoS = null;
+        List<BookDTO> bookDtos = null;
 
-        if (bookEntities != null && !bookEntities.isEmpty()) {
-            bookDtoS = new ArrayList<>();
+        if(bookEntities != null && !bookEntities.isEmpty()){// not null & not empty
+            bookDtos = new ArrayList<>();
             BookDTO dto = null;
-            for (BookEntity be : bookEntities) {
+            for(BookEntity be : bookEntities){
                 dto = new BookDTO();
                 BeanUtils.copyProperties(be, dto);
-                bookDtoS.add(dto);
+                bookDtos.add(dto);
             }
         }
-        return bookDtoS;
+        return bookDtos;
+    }
+
+    @Override
+    public BookDTO getBook(Long bookId) {
+        Optional<BookEntity> optBook = bookRepository.findById(bookId);
+        BookDTO bookDTO = null;
+        if(optBook.isPresent()){
+            bookDTO = new BookDTO();
+            BeanUtils.copyProperties(optBook.get(), bookDTO);
+        }
+        return bookDTO;
     }
 }

@@ -13,36 +13,43 @@ import java.util.List;
 @RequestMapping("/api/v1")
 public class BookController {
 
-    @Autowired
+    @Autowired//spring plz make the object of bsimpl available to bs interface reference here in controller
     private BookService bookService;
+
     @PostMapping("/books")
-    public ResponseEntity <BookDTO> addBook(@RequestBody BookDTO bookDTO){
+    public ResponseEntity<BookDTO> addBook(@RequestBody BookDTO bookDTO){
         bookDTO = bookService.addBook(bookDTO);
         ResponseEntity<BookDTO> responseEntity = new ResponseEntity<>(bookDTO, HttpStatus.CREATED);
         return responseEntity;
     }
+
     @GetMapping("/books")
     public ResponseEntity<List<BookDTO>> getAllBook(){
         List<BookDTO> books = bookService.getAllBook();
         ResponseEntity<List<BookDTO>> responseEntity = new ResponseEntity<>(books, HttpStatus.OK);
-        //67responseEntity = ResponseEntity.ok(books);
+        //responseEntity = ResponseEntity.ok(books);
+        return responseEntity;
+    }
+
+    @GetMapping("/books/{bookId}")
+    public ResponseEntity<BookDTO> getBook(@PathVariable Long bookId){
+        BookDTO bookDTO = bookService.getBook(bookId);
+        ResponseEntity<BookDTO> responseEntity = new ResponseEntity<>(bookDTO, HttpStatus.OK);
         return responseEntity;
     }
 
     @PutMapping("/books/{bookId}")
-    public ResponseEntity <BookDTO> updateBook(@RequestBody BookDTO bookDTO, @PathVariable Long bookId){
+    public ResponseEntity<BookDTO> updateBook(@RequestBody BookDTO bookDTO, @PathVariable Long bookId){
         bookDTO = bookService.updateBook(bookDTO, bookId);
         ResponseEntity<BookDTO> responseEntity = new ResponseEntity<>(bookDTO, HttpStatus.OK);
         return responseEntity;
-
     }
 
     @PatchMapping("/books/{bookId}")
-    public ResponseEntity <BookDTO> updateBookPrice(@RequestBody BookDTO bookDTO, @PathVariable Long bookId){
+    public ResponseEntity<BookDTO> updateBookPrice(@RequestBody BookDTO bookDTO, @PathVariable Long bookId){
         bookDTO = bookService.updateBookPrice(bookDTO, bookId);
         ResponseEntity<BookDTO> responseEntity = new ResponseEntity<>(bookDTO, HttpStatus.OK);
         return responseEntity;
-
     }
 
     @DeleteMapping("/books/{bookId}")
